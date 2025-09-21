@@ -4,17 +4,12 @@
 
 ## 技术栈
 
-- **前端**: HTML5 + CSS3 + 原生JavaScript
-- **3D渲染**: CSS3 Transform + Canvas API  
-- **图像处理**: Canvas 2D API + FileReader API
+- **前端**: HTML
 - **存储**: 浏览器本地存储 (LocalStorage)
 - **部署**: 静态文件部署，支持单文件部署
 
 ## 开发规范
 
-- 使用 **ES6+** 语法进行模块化开发
-- 遵循 **面向对象编程** 模式，使用类和方法组织代码
-- 采用 **事件驱动** 的交互设计
 - **响应式设计** 确保多设备兼容
 - 代码格式化使用一致的缩进和命名规范
 
@@ -153,58 +148,17 @@ class ShareGenerator {
 }
 ```
 
-## 关键命令
-
-### 开发环境
-```bash
-# 启动本地开发服务器
-npm run dev
-# 或使用Python简易服务器
-python -m http.server 8000
-```
-
-### 代码质量检查
-```bash
-# 运行ESLint代码检查
-npm run lint
-# 自动修复代码格式
-npm run lint:fix
-```
-
-### 项目构建
-```bash
-# 构建生产版本
-npm run build
-# 生成单文件版本(用于简单部署)
-npm run build:single
-```
-
-### 部署上线
-```bash
-# 部署到静态服务器
-npm run deploy
-# 上传到CDN
-npm run upload:cdn
 ```
 
 ## 技术亮点
 
-### 1. 纯前端3D渲染
-- 使用CSS3 `transform-style: preserve-3d` 实现真正的3D效果
-- JavaScript动态计算3D布局算法 (球形、圆柱形、螺旋形)
-- 支持鼠标交互和触摸手势控制
 
-### 2. Canvas图像处理
-- 实时生成分享图片，支持自定义背景和布局
-- 图片裁剪、缩放和滤镜效果
-- 支持多种图片格式导出 (PNG/JPEG/WebP)
-
-### 3. 响应式设计
+### 1. 响应式设计
 - 移动端优化的触摸交互
 - 自适应不同屏幕尺寸和设备像素比
 - 渐进增强的用户体验
 
-### 4. 性能优化
+### 2. 性能优化
 - 图片懒加载和分批渲染
 - 防抖和节流优化用户交互
 - 内存管理和定时器清理
@@ -221,22 +175,10 @@ npm run upload:cdn
 ### 静态部署
 项目支持完全静态部署，无需后端服务器：
 
-```bash
-# 构建单文件版本
-npm run build:single
-
 # 生成 love-calculator-enhanced.html
 # 可直接上传到任何支持静态文件的服务器
 ```
 
-### CDN部署
-```bash
-# 上传资源到CDN
-aws s3 sync ./dist s3://your-bucket-name --acl public-read
-
-# 配置CloudFront分发
-aws cloudfront create-invalidation --distribution-id YOUR_ID --paths "/*"
-```
 
 ## 项目特色
 
@@ -249,5 +191,3 @@ aws cloudfront create-invalidation --distribution-id YOUR_ID --paths "/*"
 ## 开发总结
 
 本项目展示了如何使用纯前端技术栈构建一个功能完整、体验优秀的Web应用。通过合理的架构设计和性能优化，实现了复杂的3D渲染、图像处理和交互功能，同时保持了良好的浏览器兼容性和部署便利性。
-
-项目代码结构清晰，采用模块化设计，易于维护和扩展。对于学习前端开发的同学来说，这是一个很好的实践项目，涵盖了HTML5、CSS3、JavaScript ES6+、Canvas API等多个核心技术点。
