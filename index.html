@@ -3,56 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D照片墙</title>
+    <title>💕 恋爱天数计算器</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <div class="upload-section">
-            <h1>3D 照片墙</h1>
-            <div class="upload-area" id="uploadArea">
-                <div class="upload-content">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7,10 12,15 17,10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                    <p>点击或拖拽上传图片</p>
-                    <p class="upload-hint">支持 JPG、PNG 格式，最多100张</p>
-                    <button type="button" id="demoBtn" class="demo-btn">📸 加载演示图片</button>
-                </div>
-                <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+        <!-- 输入界面 -->
+        <div class="input-section" id="inputSection">
+            <div class="header">
+                <h1>💕 恋爱天数计算器</h1>
+                <p class="subtitle">记录我们美好的每一天</p>
             </div>
-            <div class="uploaded-count">
-                已上传: <span id="imageCount">0</span> 张图片
+            
+            <div class="love-form">
+                <div class="couple-inputs">
+                    <div class="input-group">
+                        <label for="name1">👫 我的名字</label>
+                        <input type="text" id="name1" placeholder="输入你的名字" maxlength="10">
+                    </div>
+                    <div class="heart-connector">💕</div>
+                    <div class="input-group">
+                        <label for="name2">👫 TA的名字</label>
+                        <input type="text" id="name2" placeholder="输入TA的名字" maxlength="10">
+                    </div>
+                </div>
+                
+                <div class="date-input-group">
+                    <label for="startDate">📅 在一起的日期</label>
+                    <input type="date" id="startDate" max="" required>
+                </div>
+                
+                <div class="photo-upload-area" id="photoUploadArea">
+                    <div class="upload-content">
+                        <div class="upload-icon">📸</div>
+                        <p>上传我们的合照</p>
+                        <p class="upload-hint">点击或拖拽上传照片（可选）</p>
+                    </div>
+                    <input type="file" id="photoInput" accept="image/*" style="display: none;">
+                </div>
+                
+                <button type="button" id="calculateBtn" class="calculate-btn">
+                    <span>💖</span>
+                    <span>开始计算我们的爱</span>
+                    <span>💖</span>
+                </button>
             </div>
         </div>
 
-        <div class="photo-wall-container" id="photoWallContainer" style="display: none;">
-            <div class="controls">
-                <button id="resetBtn">重新上传</button>
-                <div class="control-group">
-                    <label class="switch">
-                        <input type="checkbox" id="autoRotate" checked>
-                        <span class="slider"></span>
-                        <span class="label-text">自动旋转</span>
-                    </label>
-                    <div class="speed-control">
-                        <label>速度: <input type="range" id="speedControl" min="0.5" max="3" step="0.1" value="1"></label>
+        <!-- 结果展示界面 -->
+        <div class="result-section" id="resultSection" style="display: none;">
+            <div class="result-header">
+                <div class="couple-names">
+                    <span class="name1" id="displayName1"></span>
+                    <span class="love-symbol">💕</span>
+                    <span class="name2" id="displayName2"></span>
+                </div>
+                <p class="love-quote">我们已经相爱了</p>
+            </div>
+            
+            <div class="love-stats">
+                <div class="main-counter">
+                    <div class="days-display">
+                        <span class="days-number" id="daysNumber">520</span>
+                        <span class="days-unit">天</span>
                     </div>
                 </div>
+                
+                <div class="milestone-grid">
+                    <!-- 里程碑卡片将通过JavaScript动态生成 -->
+                </div>
             </div>
-            <div class="photo-wall-wrapper">
-                <div class="photo-wall" id="photoWall">
-                    <!-- 3D照片将在这里动态生成 -->
-                </div>
-                <div class="interaction-hint" id="interactionHint">
-                    <p>💫 拖拽旋转 | 点击放大 | 双击重置视角</p>
-                </div>
+            
+            <div class="photo-display" id="photoDisplay" style="display: none;">
+                <img id="couplePhoto" src="" alt="我们的合照">
+            </div>
+            
+            <div class="action-buttons">
+                <button id="resetBtn" class="action-btn secondary">🔄 重新计算</button>
+                <button id="shareBtn" class="action-btn primary">📱 分享甜蜜</button>
             </div>
         </div>
     </div>
 
+    <!-- 浮动爱心效果 -->
+    <div class="floating-hearts" id="floatingHearts"></div>
+
     <script src="script.js"></script>
 </body>
+</html>
 </html>
