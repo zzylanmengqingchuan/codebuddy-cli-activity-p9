@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D照片墙</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="upload-section">
+            <h1>3D 照片墙</h1>
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-content">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7,10 12,15 17,10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    <p>点击或拖拽上传图片</p>
+                    <p class="upload-hint">支持 JPG、PNG 格式，最多100张</p>
+                </div>
+                <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+            </div>
+            <div class="uploaded-count">
+                已上传: <span id="imageCount">0</span> 张图片
+            </div>
+        </div>
+
+        <div class="photo-wall-container" id="photoWallContainer" style="display: none;">
+            <div class="controls">
+                <button id="resetBtn">重新上传</button>
+                <div class="rotation-controls">
+                    <label>
+                        <input type="checkbox" id="autoRotate" checked> 自动旋转
+                    </label>
+                </div>
+            </div>
+            <div class="photo-wall-wrapper">
+                <div class="photo-wall" id="photoWall">
+                    <!-- 3D照片将在这里动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
