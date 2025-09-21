@@ -1395,8 +1395,623 @@
                 this.showNotification(`旋转速度: ${speedText} ${factor < 1 ? '⚡' : '🐌'}`, 'info');
             }
 
-            generateShareImage() {
-                this.showNotification('分享功能开发中... 📱', 'info');
+            async generateShareImage() {
+                // 先让用户选择要展示的照片
+                if (this.images.length > 0) {
+                    this.showPhotoSelectionModal();
+                } else {
+                    this.createShareImageWithPhoto(null);
+                }
+            }
+            
+            showPhotoSelectionModal() {
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.85);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 10000;
+                    backdrop-filter: blur(15px);
+                `;
+                
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                    background: white;
+                    border-radius: 30px;
+                    padding: 40px;
+                    max-width: 650px;
+                    width: 95%;
+                    max-height: 85vh;
+                    overflow-y: auto;
+                    box-shadow: 0 30px 100px rgba(0, 0, 0, 0.6);
+                    text-align: center;
+                `;
+                
+                modalContent.innerHTML = `
+                    <h3 style="color: #ff1744; font-size: 1.6rem; font-weight: 700; margin-bottom: 20px;">💕 选择一张最喜欢的照片</h3>
+                    <p style="color: #666; margin-bottom: 30px;">这张照片将作为分享图的主要展示图片</p>
+                    <div id="photoGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 30px;"></div>
+                    <div style="display: flex; gap: 15px; justify-content: center;">
+                        <button id="skipPhotoBtn" style="padding: 12px 25px; border: 2px solid #ddd; border-radius: 25px; background: white; color: #666; cursor: pointer; font-weight: 600;">跳过选择</button>
+                        <button id="cancelSelectionBtn" style="padding: 12px 25px; border: 2px solid #ff69b4; border-radius: 25px; background: white; color: #ff69b4; cursor: pointer; font-weight: 600;">取消</button>
+                    </div>
+                `;
+                
+                const photoGrid = modalContent.querySelector('#photoGrid');
+                
+                // 添加照片选项
+                this.images.forEach((image, index) => {
+                    const photoOption = document.createElement('div');
+                    photoOption.style.cssText = `
+                        cursor: pointer;
+                        border: 3px solid transparent;
+                        border-radius: 15px;
+                        overflow: hidden;
+                        transition: all 0.3s ease;
+                        background: white;
+                        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                    `;
+                    
+                    photoOption.innerHTML = `
+                        <img src="${image.src}" style="width: 100%; height: 120px; object-fit: cover; display: block;">
+                        <p style="padding: 8px; font-size: 0.9rem; color: #666; margin: 0;">${image.name}</p>
+                    `;
+                    
+                    photoOption.addEventListener('click', () => {
+                        document.body.removeChild(modal);
+                        this.createShareImageWithPhoto(image);
+                    });
+                    
+                    photoOption.addEventListener('mouseenter', () => {
+                        photoOption.style.borderColor = '#ff69b4';
+                        photoOption.style.transform = 'translateY(-5px)';
+                        photoOption.style.boxShadow = '0 10px 25px rgba(255, 105, 180, 0.3)';
+                    });
+                    
+                    photoOption.addEventListener('mouseleave', () => {
+                        photoOption.style.borderColor = 'transparent';
+                        photoOption.style.transform = 'translateY(0)';
+                        photoOption.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+                    });
+                    
+                    photoGrid.appendChild(photoOption);
+                });
+                
+                // 事件监听
+                modalContent.querySelector('#skipPhotoBtn').addEventListener('click', () => {
+                    document.body.removeChild(modal);
+                    this.createShareImageWithPhoto(null);
+                });
+                
+                modalContent.querySelector('#cancelSelectionBtn').addEventListener('click', () => {
+                    document.body.removeChild(modal);
+                });
+                
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
+            }
+            
+            async createShareImageWithPhoto(selectedPhoto) {
+                this.showNotification('正在生成浪漫纪念图片... 🎨', 'info');
+                
+                // 创建分享画布
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // 设置画布尺寸（适合朋友圈分享）
+                canvas.width = 800;
+                canvas.height = 1200;
+                
+                // 创建优美的渐变背景
+                const bgGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                bgGradient.addColorStop(0, '#ff9a9e');
+                bgGradient.addColorStop(0.5, '#fecfef');
+                bgGradient.addColorStop(1, '#ffd1dc');
+                
+                ctx.fillStyle = bgGradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // 添加细腻的装饰元素
+                this.addEnhancedDecorations(ctx, canvas);
+                
+                // 顶部区域 - 标题和名字 (0-300px)
+                this.drawTopSection(ctx, canvas);
+                
+                // 中间区域 - 主照片 (300-800px)
+                if (selectedPhoto) {
+                    await this.drawMainPhoto(ctx, canvas, selectedPhoto);
+                } else {
+                    this.drawNoPhotoSection(ctx, canvas);
+                }
+                
+                // 底部区域 - 天数和信息 (800-1200px)
+                this.drawBottomSection(ctx, canvas);
+                
+                // 显示分享模态框
+                this.showShareModal(canvas);
+            }
+
+            addEnhancedDecorations(ctx, canvas) {
+                // 添加精美的装饰元素
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+                
+                // 大圆圈装饰
+                for (let i = 0; i < 8; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    const radius = Math.random() * 60 + 40;
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                // 小圆点装饰
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                for (let i = 0; i < 20; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    const radius = Math.random() * 8 + 3;
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                // 爱心装饰
+                const hearts = ['💕', '💖', '💗', '💘'];
+                ctx.font = '20px Arial';
+                
+                for (let i = 0; i < 8; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    const heart = hearts[Math.floor(Math.random() * hearts.length)];
+                    
+                    ctx.fillStyle = 'rgba(255, 182, 193, 0.3)';
+                    ctx.fillText(heart, x, y);
+                }
+            }
+            
+            drawTopSection(ctx, canvas) {
+                // 主标题
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 40px "PingFang SC", "Microsoft YaHei", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.shadowColor = 'rgba(255, 105, 180, 0.3)';
+                ctx.shadowBlur = 10;
+                ctx.fillText('💕 我们的爱情纪念日', canvas.width / 2, 80);
+                
+                // 重置阴影
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                
+                // 情侣名字背景
+                const namesBg = canvas.width * 0.8;
+                const namesBgHeight = 100;
+                const namesBgY = 120;
+                
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                this.drawRoundRect(ctx, (canvas.width - namesBg) / 2, namesBgY, namesBg, namesBgHeight, 50);
+                
+                // 情侣名字
+                ctx.font = 'bold 36px "PingFang SC", "Microsoft YaHei", sans-serif';
+                ctx.fillStyle = '#ff1744';
+                ctx.textAlign = 'center';
+                
+                const namesY = namesBgY + namesBgHeight / 2 + 15;
+                const name1X = canvas.width / 2 - 60;
+                const name2X = canvas.width / 2 + 60;
+                
+                ctx.fillText(this.coupleName1, name1X, namesY);
+                ctx.fillText(this.coupleName2, name2X, namesY);
+                
+                // 中间爱心
+                ctx.fillStyle = '#ff1744';
+                ctx.font = 'bold 40px Arial';
+                ctx.fillText('♥', canvas.width / 2, namesY);
+            }
+            
+            async drawMainPhoto(ctx, canvas, photo) {
+                // 照片区域
+                const photoAreaY = 300;
+                const photoAreaHeight = 500;
+                const photoSize = 320;
+                const photoX = (canvas.width - photoSize) / 2;
+                const photoY = photoAreaY + (photoAreaHeight - photoSize) / 2;
+                
+                // 照片背景装饰
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                const bgPadding = 40;
+                this.drawRoundRect(ctx, photoX - bgPadding, photoY - bgPadding, photoSize + bgPadding * 2, photoSize + bgPadding * 2, 25);
+                
+                // 绘制照片
+                try {
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.src = photo.src;
+                    
+                    if (img.complete) {
+                        ctx.save();
+                        this.clipRoundRect(ctx, photoX, photoY, photoSize, photoSize, 20);
+                        ctx.drawImage(img, photoX, photoY, photoSize, photoSize);
+                        ctx.restore();
+                    } else {
+                        // 如果图片未加载完成，显示占位符
+                        ctx.fillStyle = 'rgba(255, 182, 193, 0.3)';
+                        this.drawRoundRect(ctx, photoX, photoY, photoSize, photoSize, 20);
+                        
+                        ctx.fillStyle = '#ff69b4';
+                        ctx.font = '60px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('📷', photoX + photoSize / 2, photoY + photoSize / 2 + 20);
+                    }
+                } catch (error) {
+                    // 绘制占位符
+                    ctx.fillStyle = 'rgba(255, 182, 193, 0.3)';
+                    this.drawRoundRect(ctx, photoX, photoY, photoSize, photoSize, 20);
+                    
+                    ctx.fillStyle = '#ff69b4';
+                    ctx.font = '60px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('📷', photoX + photoSize / 2, photoY + photoSize / 2 + 20);
+                }
+                
+                // 照片描述
+                ctx.fillStyle = '#666';
+                ctx.font = 'italic 18px "PingFang SC", "Microsoft YaHei", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('我们最珍贵的回忆', canvas.width / 2, photoY + photoSize + 60);
+            }
+            
+            drawNoPhotoSection(ctx, canvas) {
+                // 无照片时的装饰区域
+                const decorY = 350;
+                const decorHeight = 400;
+                
+                // 装饰背景
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                this.drawRoundRect(ctx, 100, decorY, canvas.width - 200, decorHeight, 30);
+                
+                // 装饰文字
+                ctx.fillStyle = '#ff69b4';
+                ctx.font = 'bold 36px "PingFang SC", "Microsoft YaHei", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('💝', canvas.width / 2, decorY + 100);
+                
+                ctx.fillStyle = '#888';
+                ctx.font = 'italic 24px "PingFang SC", "Microsoft YaHei", sans-serif';
+                ctx.fillText('每一天都是爱的见证', canvas.width / 2, decorY + 150);
+                
+                // 多个小爱心装饰
+                const hearts = ['💕', '💖', '💗', '💘', '💝', '💞'];
+                ctx.font = '32px Arial';
+                for (let i = 0; i < 6; i++) {
+                    const angle = (i / 6) * Math.PI * 2;
+                    const radius = 80;
+                    const x = canvas.width / 2 + Math.cos(angle) * radius;
+                    const y = decorY + 250 + Math.sin(angle) * radius;
+                    
+                    ctx.fillStyle = 'rgba(255, 105, 180, 0.7)';
+                    ctx.fillText(hearts[i], x, y);
+                }
+            }
+            
+            drawBottomSection(ctx, canvas) {
+                const bottomY = 850;
+                
+                // 天数显示背景
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                this.drawRoundRect(ctx, 50, bottomY, canvas.width - 100, 250, 25);
+                
+                // 计算恋爱天数
+                const today = new Date();
+                const timeDiff = today.getTime() - this.loveStartDate.getTime();
+                const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
+                
+                // 天数标题
+                ctx.fillStyle = '#666';
+                ctx.font = 'bold 24px "PingFang SC", "Microsoft YaHei", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('我们已经相爱了', canvas.width / 2, bottomY + 50);
+                
+                // 大数字天数
+                ctx.fillStyle = '#ff1744';
+                ctx.font = 'bold 80px "PingFang SC", "Microsoft YaHei", sans-serif';
+                ctx.shadowColor = 'rgba(255, 105, 180, 0.4)';
+                ctx.shadowBlur = 15;
+                ctx.fillText(daysDiff, canvas.width / 2, bottomY + 140);
+                
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                
+                // 天数单位
+                ctx.fillStyle = '#ff69b4';
+                ctx.font = 'bold 28px "PingFang SC", "Microsoft YaHei", sans-serif';
+                ctx.fillText('天', canvas.width / 2, bottomY + 180);
+                
+                // 日期范围
+                const startDateStr = this.loveStartDate.toLocaleDateString('zh-CN');
+                const todayStr = today.toLocaleDateString('zh-CN');
+                
+                ctx.fillStyle = '#888';
+                ctx.font = '18px "PingFang SC", "Microsoft YaHei", sans-serif';
+                ctx.fillText(`${startDateStr} - ${todayStr}`, canvas.width / 2, bottomY + 220);
+                
+                // 底部浪漫语录
+                const romanticQuotes = [
+                    '"与你相遇，好幸运"',
+                    '"爱你是我做过最好的决定"',
+                    '"你是我今生唯一的答案"',
+                    '"与你在一起，时光都变得温柔"'
+                ];
+                
+                const randomQuote = romanticQuotes[Math.floor(Math.random() * romanticQuotes.length)];
+                
+                ctx.fillStyle = '#999';
+                ctx.font = 'italic 20px "PingFang SC", "Microsoft YaHei", sans-serif';
+                ctx.fillText(randomQuote, canvas.width / 2, canvas.height - 80);
+                
+                // 生成时间
+                ctx.fillStyle = '#bbb';
+                ctx.font = '16px "PingFang SC", "Microsoft YaHei", sans-serif';
+                const generateTime = new Date().toLocaleDateString('zh-CN');
+                ctx.fillText(`生成于 ${generateTime} · 爱情纪念册`, canvas.width / 2, canvas.height - 40);
+            }
+
+            addRomanticDecorations(ctx, canvas) {
+                // 添加浪漫装饰元素
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                
+                // 添加随机圆圈装饰
+                for (let i = 0; i < 25; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    const radius = Math.random() * 40 + 20;
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                // 添加爱心装饰
+                const hearts = ['💕', '💖', '💗', '💘', '💝', '💞', '💟', '❤️'];
+                ctx.font = '30px Arial';
+                
+                for (let i = 0; i < 15; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    const heart = hearts[Math.floor(Math.random() * hearts.length)];
+                    
+                    ctx.fillStyle = 'rgba(255, 182, 193, 0.6)';
+                    ctx.fillText(heart, x, y);
+                }
+            }
+            
+            async addPhotoGrid(ctx, canvas) {
+                // 在中间区域添加照片网格
+                const gridStartY = 580;
+                const gridHeight = 350;
+                const photoSize = 80;
+                const spacing = 20;
+                const cols = 6;
+                const rows = 3;
+                
+                const gridWidth = cols * photoSize + (cols - 1) * spacing;
+                const startX = (canvas.width - gridWidth) / 2;
+                
+                // 绘制网格背景
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                this.drawRoundRect(ctx, startX - 20, gridStartY - 20, gridWidth + 40, gridHeight + 40, 15);
+                
+                // 绘制照片占位符
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const index = row * cols + col;
+                        if (index >= Math.min(this.images.length, 18)) break;
+                        
+                        const x = startX + col * (photoSize + spacing);
+                        const y = gridStartY + row * (photoSize + spacing);
+                        
+                        // 绘制相框
+                        ctx.fillStyle = 'rgba(255, 182, 193, 0.3)';
+                        ctx.strokeStyle = '#ff69b4';
+                        ctx.lineWidth = 2;
+                        
+                        this.drawRoundRect(ctx, x, y, photoSize, photoSize, 8);
+                        ctx.stroke();
+                        
+                        // 绘制照片占位符图标
+                        ctx.fillStyle = '#ff69b4';
+                        ctx.font = '24px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('📷', x + photoSize / 2, y + photoSize / 2 + 8);
+                    }
+                }
+                
+                // 添加照片区域标题
+                ctx.font = 'bold 20px "PingFang SC", "Microsoft YaHei", sans-serif';
+                ctx.fillStyle = '#666';
+                ctx.textAlign = 'center';
+                ctx.fillText(`我们的 ${this.images.length} 张美好回忆`, canvas.width / 2, gridStartY - 30);
+            }
+            
+            showShareModal(canvas) {
+                // 创建模态框
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.85);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 10000;
+                    backdrop-filter: blur(15px);
+                    animation: modalFadeIn 0.4s ease;
+                `;
+                
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                    background: white;
+                    border-radius: 30px;
+                    padding: 40px;
+                    max-width: 550px;
+                    width: 95%;
+                    max-height: 85vh;
+                    overflow-y: auto;
+                    box-shadow: 0 30px 100px rgba(0, 0, 0, 0.6);
+                    animation: modalSlideIn 0.5s ease;
+                    text-align: center;
+                `;
+                
+                // 添加模态框内容
+                modalContent.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                        <h3 style="color: #ff1744; font-size: 1.6rem; font-weight: 700; margin: 0;">💕 分享我们的爱情</h3>
+                        <button id="closeShareModal" style="background: none; border: none; font-size: 2rem; cursor: pointer; color: #999; padding: 5px;">×</button>
+                    </div>
+                    <div style="margin-bottom: 30px;">
+                        <img id="sharePreview" style="max-width: 100%; border-radius: 20px; box-shadow: 0 20px 60px rgba(255, 105, 180, 0.4);" />
+                    </div>
+                    <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                        <button id="downloadShare" style="padding: 15px 30px; border: none; border-radius: 25px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s ease; font-weight: 600; display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #ff6b9d, #ff1744); color: white; box-shadow: 0 10px 30px rgba(255, 105, 180, 0.4);">
+                            📥 下载图片
+                        </button>
+                        <button id="copyShare" style="padding: 15px 30px; border: 2px solid rgba(255, 182, 193, 0.6); border-radius: 25px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s ease; font-weight: 600; display: flex; align-items: center; gap: 10px; background: rgba(255, 182, 193, 0.4); color: #ff1744;">
+                            📋 复制图片
+                        </button>
+                    </div>
+                `;
+                
+                // 显示预览图
+                const sharePreview = modalContent.querySelector('#sharePreview');
+                sharePreview.src = canvas.toDataURL('image/png');
+                
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
+                
+                // 添加事件监听
+                modalContent.querySelector('#closeShareModal').addEventListener('click', () => {
+                    document.body.removeChild(modal);
+                });
+                
+                modalContent.querySelector('#downloadShare').addEventListener('click', () => {
+                    this.downloadShareImage(canvas);
+                });
+                
+                modalContent.querySelector('#copyShare').addEventListener('click', () => {
+                    this.copyShareImage(canvas);
+                });
+                
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        document.body.removeChild(modal);
+                    }
+                });
+                
+                // 添加模态框动画
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes modalFadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                    }
+                    @keyframes modalSlideIn {
+                        from {
+                            opacity: 0;
+                            transform: scale(0.8) translateY(50px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: scale(1) translateY(0);
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                this.showNotification('浪漫纪念图片生成完成！💕', 'success');
+            }
+            
+            downloadShareImage(canvas) {
+                const dataURL = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                const fileName = `${this.coupleName1}和${this.coupleName2}的爱情纪念_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.png`;
+                link.download = fileName;
+                link.href = dataURL;
+                link.click();
+                
+                this.showNotification('图片下载成功！📥', 'success');
+            }
+            
+            async copyShareImage(canvas) {
+                try {
+                    canvas.toBlob(async (blob) => {
+                        try {
+                            await navigator.clipboard.write([
+                                new ClipboardItem({ 'image/png': blob })
+                            ]);
+                            this.showNotification('图片已复制到剪贴板！📋', 'success');
+                        } catch (error) {
+                            this.fallbackCopyText();
+                        }
+                    });
+                } catch (error) {
+                    this.fallbackCopyText();
+                }
+            }
+            
+            fallbackCopyText() {
+                const today = new Date();
+                const timeDiff = today.getTime() - this.loveStartDate.getTime();
+                const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
+                
+                const shareText = `💕 ${this.coupleName1} & ${this.coupleName2} 的爱情纪念日\n\n我们已经相爱了 ${daysDiff} 天！\n\n与你相遇，好幸运 ❤️\n\n#爱情纪念 #甜蜜时光 #${daysDiff}天`;
+                
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(shareText).then(() => {
+                        this.showNotification('文本已复制到剪贴板！📋', 'success');
+                    }).catch(() => {
+                        this.showNotification('复制失败，请手动截图分享', 'warning');
+                    });
+                } else {
+                    this.showNotification('复制失败，请手动截图分享', 'warning');
+                }
+            }
+            
+            drawRoundRect(ctx, x, y, width, height, radius) {
+                ctx.beginPath();
+                ctx.moveTo(x + radius, y);
+                ctx.lineTo(x + width - radius, y);
+                ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+                ctx.lineTo(x + width, y + height - radius);
+                ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                ctx.lineTo(x + radius, y + height);
+                ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+                ctx.lineTo(x, y + radius);
+                ctx.quadraticCurveTo(x, y, x + radius, y);
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            clipRoundRect(ctx, x, y, width, height, radius) {
+                ctx.beginPath();
+                ctx.moveTo(x + radius, y);
+                ctx.lineTo(x + width - radius, y);
+                ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+                ctx.lineTo(x + width, y + height - radius);
+                ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                ctx.lineTo(x + radius, y + height);
+                ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+                ctx.lineTo(x, y + radius);
+                ctx.quadraticCurveTo(x, y, x + radius, y);
+                ctx.closePath();
+                ctx.clip();
             }
 
             resetToStart() {
