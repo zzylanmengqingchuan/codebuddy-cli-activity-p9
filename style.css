@@ -73,6 +73,25 @@ body {
     opacity: 0.7;
 }
 
+.demo-btn {
+    background: rgba(255, 105, 180, 0.8);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.demo-btn:hover {
+    background: rgba(255, 105, 180, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+}
+
 .uploaded-count {
     color: white;
     font-size: 1.1rem;
@@ -114,34 +133,170 @@ body {
     transform: translateY(-2px);
 }
 
-.rotation-controls {
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 20px;
     color: white;
+}
+
+/* 自定义开关样式 */
+.switch {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.rotation-controls input[type="checkbox"] {
-    transform: scale(1.2);
-    margin-right: 8px;
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 24px;
+    transition: 0.4s;
+    cursor: pointer;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.4s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+input:checked + .slider {
+    background-color: #ff69b4;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.label-text {
+    font-size: 0.9rem;
+    user-select: none;
+}
+
+.speed-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.speed-control input[type="range"] {
+    width: 80px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.speed-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #ff69b4;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.speed-control input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #ff69b4;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.interaction-hint {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+    animation: fadeInOut 6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes fadeInOut {
+    0%, 20%, 80%, 100% {
+        opacity: 0.8;
+    }
+    40%, 60% {
+        opacity: 0.3;
+    }
+}
+
+@keyframes slideInOut {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    15%, 85% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
 }
 
 /* 3D照片墙样式 */
 .photo-wall-wrapper {
-    perspective: 1200px;
-    height: 80vh;
+    perspective: 1500px;
+    height: 85vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.photo-wall-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.3) 70%);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .photo-wall {
     position: relative;
-    width: 300px;
-    height: 300px;
+    width: 400px;
+    height: 400px;
     transform-style: preserve-3d;
-    animation: autoRotate 20s infinite linear;
+    animation: autoRotate 25s infinite linear;
     cursor: grab;
+    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.2));
 }
 
 .photo-wall:active {
@@ -154,21 +309,44 @@ body {
 
 .photo {
     position: absolute;
-    width: 120px;
-    height: 120px;
-    border-radius: 10px;
+    width: 140px;
+    height: 140px;
+    border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
+    box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.4),
+        0 5px 15px rgba(0, 0, 0, 0.2),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     cursor: pointer;
-    border: 3px solid rgba(255, 255, 255, 0.8);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+    transform-origin: center center;
+}
+
+.photo::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(0,0,0,0.1) 100%);
+    pointer-events: none;
+    z-index: 2;
+    border-radius: 13px;
 }
 
 .photo:hover {
-    transform: scale(1.1) !important;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
-    border-color: #4CAF50;
+    transform: scale(1.15) translateZ(50px) !important;
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.6),
+        0 10px 25px rgba(0, 0, 0, 0.3),
+        0 0 30px rgba(255, 255, 255, 0.3),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.8);
     z-index: 100;
+    filter: brightness(1.1) saturate(1.2);
 }
 
 .photo img {
@@ -176,24 +354,86 @@ body {
     height: 100%;
     object-fit: cover;
     display: block;
+    transition: all 0.4s ease;
+    border-radius: 13px;
+}
+
+.photo:hover img {
+    transform: scale(1.05);
 }
 
 /* 自动旋转动画 */
 @keyframes autoRotate {
     0% {
-        transform: rotateY(0deg) rotateX(0deg);
+        transform: rotateY(0deg) rotateX(15deg) rotateZ(0deg);
     }
     25% {
-        transform: rotateY(90deg) rotateX(10deg);
+        transform: rotateY(90deg) rotateX(10deg) rotateZ(5deg);
     }
     50% {
-        transform: rotateY(180deg) rotateX(0deg);
+        transform: rotateY(180deg) rotateX(-5deg) rotateZ(0deg);
     }
     75% {
-        transform: rotateY(270deg) rotateX(-10deg);
+        transform: rotateY(270deg) rotateX(-10deg) rotateZ(-5deg);
     }
     100% {
-        transform: rotateY(360deg) rotateX(0deg);
+        transform: rotateY(360deg) rotateX(15deg) rotateZ(0deg);
+    }
+}
+
+/* 浮动动画 */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* 心形粒子动画 */
+@keyframes heartFloat {
+    0% {
+        transform: translateY(100vh) scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100px) scale(1) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 0.1;
+    }
+}
+
+/* 照片进入动画 */
+@keyframes photoEnter {
+    0% {
+        opacity: 0;
+        transform: scale(0.3) rotateY(180deg);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.1) rotateY(90deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotateY(0deg);
     }
 }
 
