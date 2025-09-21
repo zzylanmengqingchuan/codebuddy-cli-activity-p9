@@ -13,24 +13,6 @@
 - **响应式设计** 确保多设备兼容
 - 代码格式化使用一致的缩进和命名规范
 
-## 项目结构
-
-```
-/tengxuncli_activity
-├── /assets - 静态资源文件
-│   ├── /images - 示例图片
-│   └── /styles - 样式组件
-├── /components - 核心功能组件  
-│   ├── Enhanced3DPhotoWall.js - 3D照片墙组件
-│   ├── PhotoUploader.js - 照片上传组件
-│   ├── LoveCalculator.js - 恋爱天数计算组件
-│   └── ShareGenerator.js - 分享图片生成组件
-├── /utils - 工具函数库
-│   ├── dateUtils.js - 日期处理工具
-│   ├── canvasUtils.js - Canvas绘图工具
-│   └── animationUtils.js - 动画效果工具
-└── /dist - 构建输出目录
-```
 
 ## 核心功能模块
 
