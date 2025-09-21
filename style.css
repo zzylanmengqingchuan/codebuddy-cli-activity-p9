@@ -41,8 +41,8 @@ body::before {
     z-index: 1;
 }
 
-/* 输入界面样式 */
-.input-section {
+/* 恋爱信息输入界面样式 */
+.love-info-section {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 30px;
     padding: 40px 30px;
@@ -174,38 +174,63 @@ body::before {
     box-shadow: 0 0 20px rgba(255, 105, 180, 0.3);
 }
 
-.photo-upload-area {
-    border: 2px dashed rgba(255, 182, 193, 0.5);
+/* 上传区域样式 */
+.upload-area {
+    background: rgba(255, 255, 255, 0.1);
+    border: 3px dashed rgba(255, 182, 193, 0.5);
     border-radius: 20px;
-    padding: 30px 20px;
-    text-align: center;
+    padding: 40px 20px;
+    margin: 20px 0;
     cursor: pointer;
     transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    text-align: center;
+}
+
+.upload-area:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 182, 193, 0.8);
+    transform: translateY(-3px);
+}
+
+.upload-area.dragover {
     background: rgba(255, 255, 255, 0.3);
-}
-
-.photo-upload-area:hover {
     border-color: #ff69b4;
-    background: rgba(255, 255, 255, 0.5);
-    transform: translateY(-2px);
+    transform: scale(1.02);
 }
 
-.upload-icon {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-}
-
-.photo-upload-area p {
+.upload-content {
     color: #666;
-    margin-bottom: 5px;
+}
+
+.upload-content svg {
+    margin-bottom: 15px;
+    opacity: 0.8;
+    color: #ff69b4;
+}
+
+.upload-content p {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
 }
 
 .upload-hint {
-    font-size: 0.8rem !important;
+    font-size: 0.9rem !important;
     opacity: 0.7;
 }
 
-.calculate-btn {
+.uploaded-count {
+    text-align: center;
+    color: #666;
+    font-size: 1rem;
+    margin: 15px 0;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.create-wall-btn {
     background: linear-gradient(135deg, #ff69b4, #ff1493);
     color: white;
     border: none;
@@ -222,9 +247,21 @@ body::before {
     box-shadow: 0 10px 30px rgba(255, 105, 180, 0.4);
     position: relative;
     overflow: hidden;
+    width: 100%;
+    margin-top: 20px;
 }
 
-.calculate-btn::before {
+.create-wall-btn:disabled {
+    background: linear-gradient(135deg, #ccc, #999);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.create-wall-btn:disabled:hover {
+    transform: none;
+}
+
+.create-wall-btn::before {
     content: '';
     position: absolute;
     top: 0;
@@ -235,16 +272,16 @@ body::before {
     transition: left 0.5s;
 }
 
-.calculate-btn:hover::before {
+.create-wall-btn:hover::before {
     left: 100%;
 }
 
-.calculate-btn:hover {
+.create-wall-btn:hover:not(:disabled) {
     transform: translateY(-3px);
     box-shadow: 0 15px 40px rgba(255, 105, 180, 0.5);
 }
 
-.calculate-btn:active {
+.create-wall-btn:active:not(:disabled) {
     transform: translateY(-1px);
 }
 
@@ -620,5 +657,309 @@ body::before {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+/* 照片墙容器样式 */
+.photo-wall-container {
+    margin-top: 40px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 恋爱信息显示 */
+.love-display {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 25px;
+    box-shadow: 0 15px 40px rgba(255, 105, 180, 0.3);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 182, 193, 0.3);
+}
+
+.love-display .couple-names {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.love-display .name1, 
+.love-display .name2 {
+    color: #ff69b4;
+    padding: 8px 16px;
+    background: rgba(255, 182, 193, 0.2);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 182, 193, 0.3);
+}
+
+.love-display .love-symbol {
+    font-size: 1.8rem;
+    animation: heartBeat 2s ease-in-out infinite;
+}
+
+.love-days {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.love-text {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.love-days .days-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ff69b4, #ff1493);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: numberGlow 3s ease-in-out infinite;
+}
+
+.love-days .days-unit {
+    font-size: 1.3rem;
+    color: #ff69b4;
+    font-weight: 600;
+}
+
+/* 控制按钮样式更新 */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.share-btn {
+    background: linear-gradient(135deg, #ff69b4, #ff1493);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    font-weight: 600;
+    box-shadow: 0 8px 25px rgba(255, 105, 180, 0.4);
+}
+
+.share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(255, 105, 180, 0.5);
+}
+
+/* 3D照片墙样式 */
+.photo-wall-wrapper {
+    perspective: 2000px;
+    perspective-origin: center center;
+    height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    background: 
+        radial-gradient(ellipse at top, rgba(255,182,193,0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at bottom, rgba(138,43,226,0.1) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(25,25,112,0.8) 0%, rgba(72,61,139,0.6) 50%, rgba(123,104,238,0.4) 100%);
+    border-radius: 25px;
+    border: 1px solid rgba(255, 182, 193, 0.3);
+}
+
+.photo-wall {
+    position: relative;
+    width: 600px;
+    height: 600px;
+    transform-style: preserve-3d;
+    animation: sophisticatedRotate 40s infinite linear;
+    cursor: grab;
+    filter: 
+        drop-shadow(0 0 50px rgba(255, 182, 193, 0.4))
+        drop-shadow(0 0 100px rgba(138, 43, 226, 0.2));
+}
+
+.photo-wall:active {
+    cursor: grabbing;
+}
+
+.photo-wall.manual-control {
+    animation: none;
+}
+
+.photo {
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.6),
+        0 8px 25px rgba(0, 0, 0, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    cursor: pointer;
+    border: 2px solid transparent;
+    backdrop-filter: blur(12px) saturate(180%);
+    transform-origin: center center;
+}
+
+.photo:hover {
+    transform: scale(1.35) translateZ(120px) rotateY(5deg) rotateX(-5deg) !important;
+    box-shadow: 
+        0 40px 100px rgba(0, 0, 0, 0.8),
+        0 20px 50px rgba(0, 0, 0, 0.5),
+        0 0 60px rgba(255, 105, 180, 0.8),
+        0 0 30px rgba(138, 43, 226, 0.6);
+    z-index: 1000;
+    border: 2px solid rgba(255, 105, 180, 0.9);
+}
+
+.photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: all 0.4s ease;
+    border-radius: 13px;
+}
+
+/* 分享模态框样式 */
+.share-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(10px);
+}
+
+.share-modal-content {
+    background: white;
+    border-radius: 25px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+}
+
+.share-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.share-header h3 {
+    color: #ff69b4;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+    color: #ff69b4;
+}
+
+.share-preview {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.share-preview img {
+    max-width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 15px 40px rgba(255, 105, 180, 0.3);
+}
+
+.share-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.share-action-btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.share-action-btn.primary {
+    background: linear-gradient(135deg, #ff69b4, #ff1493);
+    color: white;
+    box-shadow: 0 8px 25px rgba(255, 105, 180, 0.4);
+}
+
+.share-action-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(255, 105, 180, 0.5);
+}
+
+.share-action-btn.secondary {
+    background: rgba(255, 182, 193, 0.3);
+    color: #ff69b4;
+    border: 1px solid rgba(255, 182, 193, 0.5);
+}
+
+.share-action-btn.secondary:hover {
+    background: rgba(255, 182, 193, 0.5);
+    transform: translateY(-2px);
+}
+
+/* 高级旋转动画 */
+@keyframes sophisticatedRotate {
+    0% {
+        transform: rotateY(0deg) rotateX(15deg) rotateZ(0deg);
+    }
+    25% {
+        transform: rotateY(90deg) rotateX(10deg) rotateZ(-3deg);
+    }
+    50% {
+        transform: rotateY(180deg) rotateX(-15deg) rotateZ(0deg);
+    }
+    75% {
+        transform: rotateY(270deg) rotateX(-10deg) rotateZ(3deg);
+    }
+    100% {
+        transform: rotateY(360deg) rotateX(15deg) rotateZ(0deg);
     }
 }

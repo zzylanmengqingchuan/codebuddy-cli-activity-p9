@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💕 恋爱天数计算器</title>
+    <title>💕 浪漫3D照片墙 & 恋爱天数计算器</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <!-- 输入界面 -->
-        <div class="input-section" id="inputSection">
+        <!-- 恋爱信息输入界面 -->
+        <div class="love-info-section" id="loveInfoSection">
             <div class="header">
-                <h1>💕 恋爱天数计算器</h1>
-                <p class="subtitle">记录我们美好的每一天</p>
+                <h1>💕 我们的爱情回忆墙</h1>
+                <p class="subtitle">记录每一个美好瞬间，计算我们的甜蜜时光</p>
             </div>
             
             <div class="love-form">
@@ -33,62 +33,97 @@
                     <input type="date" id="startDate" max="" required>
                 </div>
                 
-                <div class="photo-upload-area" id="photoUploadArea">
+                <div class="upload-area" id="uploadArea">
                     <div class="upload-content">
-                        <div class="upload-icon">📸</div>
-                        <p>上传我们的合照</p>
-                        <p class="upload-hint">点击或拖拽上传照片（可选）</p>
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7,10 12,15 17,10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        <p>上传我们的美好回忆</p>
+                        <p class="upload-hint">支持 JPG、PNG 格式，至少10张照片</p>
+                        <button type="button" id="demoBtn" class="demo-btn">📸 加载演示图片</button>
                     </div>
-                    <input type="file" id="photoInput" accept="image/*" style="display: none;">
+                    <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
                 </div>
                 
-                <button type="button" id="calculateBtn" class="calculate-btn">
+                <div class="uploaded-count">
+                    已上传: <span id="imageCount">0</span> 张图片
+                </div>
+                
+                <button type="button" id="createWallBtn" class="create-wall-btn" disabled>
                     <span>💖</span>
-                    <span>开始计算我们的爱</span>
+                    <span>创建我们的3D回忆墙</span>
                     <span>💖</span>
                 </button>
             </div>
         </div>
 
-        <!-- 结果展示界面 -->
-        <div class="result-section" id="resultSection" style="display: none;">
-            <div class="result-header">
+        <!-- 3D照片墙展示界面 -->
+        <div class="photo-wall-container" id="photoWallContainer" style="display: none;">
+            <!-- 恋爱信息显示 -->
+            <div class="love-display">
                 <div class="couple-names">
                     <span class="name1" id="displayName1"></span>
                     <span class="love-symbol">💕</span>
                     <span class="name2" id="displayName2"></span>
                 </div>
-                <p class="love-quote">我们已经相爱了</p>
+                <div class="love-days">
+                    <span class="love-text">我们已经相爱了</span>
+                    <span class="days-number" id="daysNumber">520</span>
+                    <span class="days-unit">天</span>
+                </div>
             </div>
             
-            <div class="love-stats">
-                <div class="main-counter">
-                    <div class="days-display">
-                        <span class="days-number" id="daysNumber">520</span>
-                        <span class="days-unit">天</span>
+            <div class="controls">
+                <button id="resetBtn">🔄 重新开始</button>
+                <div class="control-group">
+                    <label class="switch">
+                        <input type="checkbox" id="autoRotate" checked>
+                        <span class="slider"></span>
+                        <span class="label-text">自动旋转</span>
+                    </label>
+                    <div class="speed-control">
+                        <label>速度: <input type="range" id="speedControl" min="0.5" max="3" step="0.1" value="1"></label>
                     </div>
                 </div>
-                
-                <div class="milestone-grid">
-                    <!-- 里程碑卡片将通过JavaScript动态生成 -->
+                <button id="shareBtn" class="share-btn">📱 生成分享图片</button>
+            </div>
+            
+            <div class="photo-wall-wrapper">
+                <div class="photo-wall" id="photoWall">
+                    <!-- 3D照片将在这里动态生成 -->
                 </div>
-            </div>
-            
-            <div class="photo-display" id="photoDisplay" style="display: none;">
-                <img id="couplePhoto" src="" alt="我们的合照">
-            </div>
-            
-            <div class="action-buttons">
-                <button id="resetBtn" class="action-btn secondary">🔄 重新计算</button>
-                <button id="shareBtn" class="action-btn primary">📱 分享甜蜜</button>
+                <div class="interaction-hint" id="interactionHint">
+                    <p>💫 拖拽旋转 | 点击放大 | 双击重置视角</p>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- 分享图片生成画布 -->
+    <canvas id="shareCanvas" style="display: none;"></canvas>
+
     <!-- 浮动爱心效果 -->
     <div class="floating-hearts" id="floatingHearts"></div>
 
+    <!-- 分享模态框 -->
+    <div class="share-modal" id="shareModal" style="display: none;">
+        <div class="share-modal-content">
+            <div class="share-header">
+                <h3>💕 分享我们的甜蜜时光</h3>
+                <button class="close-btn" id="closeShareModal">×</button>
+            </div>
+            <div class="share-preview">
+                <img id="sharePreview" alt="分享预览图" />
+            </div>
+            <div class="share-actions">
+                <button id="downloadShare" class="share-action-btn primary">📥 下载图片</button>
+                <button id="copyShare" class="share-action-btn secondary">📋 复制图片</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
-</html>
 </html>
